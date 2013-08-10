@@ -32,6 +32,7 @@ path {
 }
 
 
+
 /*.major_road { stroke: #776; }*/
 /*.minor_road { stroke: #ccb; }*/
 /*.highway { stroke: #f39; stroke-width: 1.5px; }*/
@@ -42,7 +43,69 @@ path {
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/d3.geo.tile.v0.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<p id=add_data> Add Data</p>
 <script>
+
+
+//pull in the foursquare data
+var resp = $.ajax("data/test_fsq.json");
+//set up some variables 
+var places = new Array();
+var route = new Object();
+
+//once the doc is ready, let the add data button add in data on click.
+$(document).ready( function() {
+  $("#add_data").on("click",function() {
+
+//loop through the data received by fsq for checkins be added to the place variable
+    $(resp.responseJSON.response.checkins.items).each(function(i) {
+         places[i] =  {name: this.venue.name, location: Array(this.venue.location.lng ,  this.venue.location.lat) };
+        });
+
+//setting up the route type of data
+route = {
+  type: "LineString",
+  coordinates: [
+    ]
+  };
+
+//adding in the data for each each coordinate into the routes
+$(places).each(function(i) {
+             if(i<places.length) {
+                    route.coordinates[i] = (this.location) 
+                                  }
+});
+
+
+//actually adding in the routes to the page
+svg.append("path")
+    .datum(route)
+    .attr("class", "route")
+    .attr("d", path);
+
+
+//adding in points to the page
+var point = svg.append("g")
+    .attr("class", "points")
+    .selectAll("g")
+    .data(places)
+    .enter().append("g")
+    .attr("transform", function(d) { return "translate(" + projection(d.location) + ")"; })
+    .attr("class","show_text")
+    .text(function(d) {return "<div>" +  d.name  + "</div>";});
+
+//adding some slick looking circles to each point.
+point.append("circle")
+    .attr("r", 4.5);
+
+  });
+///tbd tooltips
+ $(".show_text").on("mouseOver",console.log(this));
+
+});
+
+
 
 var width = Math.max(960, window.innerWidth),
     height = Math.max(500, window.innerHeight);
@@ -65,35 +128,6 @@ var svg = d3.select("body").append("svg")
     .call(renderTiles, "buildings");
 
 
-var places = {
-  work: [ -122.40543007850646, 37.77174938928698],
-  moniques:[-122.42973690096966, 37.77369220953868]
-  }
-
-var route = {
-  type: "LineString",
-  coordinates: [
-    places.work,
-    places.moniques
-  ]
-};
-
-svg.append("path")
-    .datum(route)
-    .attr("class", "route")
-    .attr("d", path);
-
-var point = svg.append("g")
-    .attr("class", "points")
-  .selectAll("g")
-    .data(d3.entries(places))
-  .enter().append("g")
-    .attr("transform", function(d) { return "translate(" + projection(d.value) + ")"; });
-
-
-
-point.append("circle")
-    .attr("r", 4.5);
 
 function renderTiles(svg, type) {
   svg.append("g")
