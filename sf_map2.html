@@ -31,6 +31,11 @@ path {
   stroke-width: 3px;
 }
 
+p {
+display:inline;
+white-space:nowrap;
+}
+
 
 
 /*.major_road { stroke: #776; }*/
@@ -40,16 +45,20 @@ path {
 .buildings path { stroke: none; fill: black; }
 
 </style>
+<title>Foursquare Adventures</title>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/d3.geo.tile.v0.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-<p id=add_data> Add Data</p>
+<p id=add_data> Add Data   </p>
 <script>
 
 
+
+
+var x = 10;
 //pull in the foursquare data
-var resp = $.ajax("data/test_fsq.json");
+var resp = $.getJSON("https://api.foursquare.com/v2/users/self/checkins?oauth_token=QX12ZNQXJYFJP0KPVHEIPH1L5FBOCHEQLWDBIS2IY5LOKNRN&v=2012081");
 //set up some variables 
 var places = new Array();
 var routes = new Array();
@@ -106,14 +115,19 @@ var point = svg.append("g")
 
 //adding some slick looking circles to each point.
 point.append("circle")
-    .attr("r", 4.5);
+    .attr("r", 4.5)
+    .text(function(d) {return d.name});
+
+ $("circle").mouseover(function() {
+                 $("p").text(this.textContent);
+                                  });
+
+ $("circle").mouseleave(function() {
+                                  });
 
   });
-///tbd tooltips
- $(".show_text").on("mouseOver",console.log(this));
 
 });
-
 
 
 var width = Math.max(960, window.innerWidth),
@@ -157,5 +171,8 @@ function renderTiles(svg, type) {
         });
       });
 }
+
+
+
 
 </script>
